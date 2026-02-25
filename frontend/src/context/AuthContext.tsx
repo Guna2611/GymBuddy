@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             try {
                 // Validate token with backend — if expired/invalid this throws 401
-                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/me`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/me`, {
                     headers: { Authorization: `Bearer ${savedToken}` }
                 });
 
