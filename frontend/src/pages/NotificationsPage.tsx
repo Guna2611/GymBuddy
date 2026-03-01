@@ -12,6 +12,7 @@ const typeIcons: Record<string, string> = {
     'ticket-active': '🏋️',
     'ticket-completed': '🏆',
     'ticket-cancelled': '🚫',
+    'nearby-gym': '📍',
     'system': '⚙️',
 };
 

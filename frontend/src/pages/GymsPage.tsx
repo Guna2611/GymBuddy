@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Sidebar from '../components/Sidebar';
 import GymCard from '../components/GymCard';
 import { gymService } from '../services/gymService';
-import { MapPin, Search, Loader2 } from 'lucide-react';
+import { MapPin, Search, Loader2, Navigation, AlertCircle } from 'lucide-react';
+
+type LocationMode = 'detecting' | 'gps' | 'city' | 'denied';
 
 const GymsPage = () => {
     const [gyms, setGyms] = useState<any[]>([]);
@@ -10,8 +12,27 @@ const GymsPage = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [cityFilter, setCityFilter] = useState('');
+    const [locationMode, setLocationMode] = useState<LocationMode>('detecting');
 
-    const fetchGyms = useCallback(async () => {
+    // Fetch gyms by GPS coords
+    const fetchNearbyGyms = useCallback(async (lat: number, lng: number) => {
+        try {
+            setLoading(true);
+            setError('');
+            const data = await gymService.getNearbyGyms(lat, lng, 10);
+            setGyms(data.gyms || []);
+            setLocationMode('gps');
+            // Silently save coords to backend for future notifications
+            gymService.updateUserLocation(lat, lng).catch(() => { });
+        } catch (err: any) {
+            setError('Failed to load nearby gyms');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Fetch gyms by city text filter (fallback)
+    const fetchByCity = useCallback(async () => {
         try {
             setLoading(true);
             setError('');
@@ -24,7 +45,39 @@ const GymsPage = () => {
         }
     }, [cityFilter]);
 
-    useEffect(() => { fetchGyms(); }, [fetchGyms]);
+    const hasRequestedLocation = useRef(false);
+
+    // Try to get GPS on mount
+    useEffect(() => {
+        if (hasRequestedLocation.current) return;
+        hasRequestedLocation.current = true;
+
+        if (!navigator.geolocation) {
+            setLocationMode('denied');
+            fetchByCity();
+            return;
+        }
+        setLocationMode('detecting');
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const { latitude, longitude } = pos.coords;
+                fetchNearbyGyms(latitude, longitude);
+            },
+            () => {
+                // GPS denied or failed — fall back to city text filter
+                setLocationMode('denied');
+                fetchByCity();
+            },
+            { timeout: 8000 }
+        );
+    }, [fetchByCity]); // Only depend on fetchByCity which is memoized
+
+    // Re-fetch when city filter changes (only in city/denied mode)
+    useEffect(() => {
+        if (locationMode === 'city' || locationMode === 'denied') {
+            fetchByCity();
+        }
+    }, [cityFilter, locationMode, fetchByCity]);
 
     const cities = [...new Set(gyms.map((g: any) => g.address?.city).filter(Boolean))];
 
@@ -45,9 +98,41 @@ const GymsPage = () => {
                 <div className="max-w-5xl mx-auto">
                     <div className="mb-6">
                         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                            <MapPin className="w-6 h-6 text-accent" /> Browse Gyms
+                            <MapPin className="w-6 h-6 text-accent" /> Nearby Gyms
                         </h1>
-                        <p className="text-sm text-dark-300 mt-1">Discover gyms in your area for your workout sessions</p>
+                        {/* Location status banner */}
+                        {locationMode === 'detecting' && (
+                            <div className="mt-2 flex items-center gap-2 text-xs text-dark-300">
+                                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                                Detecting your location...
+                            </div>
+                        )}
+                        {locationMode === 'gps' && (
+                            <div className="mt-2 flex items-center gap-2 text-xs text-emerald-400">
+                                <Navigation className="w-3.5 h-3.5" />
+                                Showing gyms within 10 km of your location
+                            </div>
+                        )}
+                        {locationMode === 'denied' && (
+                            <div className="mt-2 flex items-center gap-2 text-xs text-amber-400">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                Location access denied — filter by city below or&nbsp;
+                                <button
+                                    className="underline hover:text-white transition-colors"
+                                    onClick={() => {
+                                        setLoading(true);
+                                        setGyms([]);
+                                        setLocationMode('detecting');
+                                        navigator.geolocation.getCurrentPosition(
+                                            (pos) => fetchNearbyGyms(pos.coords.latitude, pos.coords.longitude),
+                                            () => { setLocationMode('denied'); fetchByCity(); }
+                                        );
+                                    }}
+                                >
+                                    try again
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Search & Filters */}
@@ -62,16 +147,28 @@ const GymsPage = () => {
                                 className="input-field pl-10"
                             />
                         </div>
-                        <select
-                            value={cityFilter}
-                            onChange={e => setCityFilter(e.target.value)}
-                            className="input-field w-auto min-w-[150px]"
-                        >
-                            <option value="">All Cities</option>
-                            {cities.map(city => (
-                                <option key={city} value={city}>{city}</option>
-                            ))}
-                        </select>
+                        {/* City filter — show when GPS not active */}
+                        {(locationMode === 'denied' || locationMode === 'city') && (
+                            <select
+                                value={cityFilter}
+                                onChange={e => { setCityFilter(e.target.value); setLocationMode('city'); }}
+                                className="input-field w-auto min-w-[150px]"
+                            >
+                                <option value="">All Cities</option>
+                                {cities.map(city => (
+                                    <option key={city} value={city}>{city}</option>
+                                ))}
+                            </select>
+                        )}
+                        {/* GPS mode: offer to switch to city browsing */}
+                        {locationMode === 'gps' && (
+                            <button
+                                onClick={() => { setLocationMode('city'); }}
+                                className="btn-secondary text-xs py-2 whitespace-nowrap"
+                            >
+                                Browse All Cities
+                            </button>
+                        )}
                     </div>
 
                     {/* Results count */}
@@ -79,27 +176,40 @@ const GymsPage = () => {
 
                     {/* Content */}
                     {loading ? (
-                        <div className="flex justify-center py-20">
+                        <div className="flex flex-col items-center justify-center py-20 gap-3">
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            <p className="text-sm text-dark-400">
+                                {locationMode === 'detecting' ? 'Finding gyms near you...' : 'Loading gyms...'}
+                            </p>
                         </div>
                     ) : error ? (
                         <div className="glass-card p-6 text-center">
                             <p className="text-danger-light text-sm">{error}</p>
-                            <button onClick={fetchGyms} className="btn-secondary text-xs mt-3">Try Again</button>
+                            <button onClick={fetchByCity} className="btn-secondary text-xs mt-3">Try Again</button>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {filteredGyms.length > 0 ? (
                                 filteredGyms.map(gym => (
-                                    <GymCard key={gym._id} gym={gym} />
+                                    <GymCard key={gym._id} gym={gym} distanceKm={gym.distanceKm} />
                                 ))
                             ) : (
                                 <div className="col-span-full text-center py-16">
                                     <MapPin className="w-12 h-12 text-dark-500 mx-auto mb-3" />
                                     <p className="text-dark-300">No gyms found</p>
                                     <p className="text-xs text-dark-400 mt-1">
-                                        {searchTerm || cityFilter ? 'Try adjusting your search' : 'No gyms have been added yet'}
+                                        {locationMode === 'gps'
+                                            ? 'No gyms within 10 km. Try browsing all cities.'
+                                            : searchTerm || cityFilter ? 'Try adjusting your search' : 'No gyms have been added yet'}
                                     </p>
+                                    {locationMode === 'gps' && (
+                                        <button
+                                            onClick={() => setLocationMode('city')}
+                                            className="btn-secondary text-xs mt-3"
+                                        >
+                                            Browse All Cities
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -44,7 +44,10 @@ const register = async (req, res, next) => {
             emailVerifyToken
         });
 
-        // Verification email will be sent after gym setup (in gymController.createGym)
+        // Send verification email for gym owners immediately
+        if (userRole === 'gymOwner' && emailVerifyToken) {
+            await sendVerificationEmail(user.email, user.name, emailVerifyToken);
+        }
 
         // Generate token
         const token = generateToken(user._id);

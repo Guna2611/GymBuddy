@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { createGym, getGyms, getGymById, updateGym, getMyGyms, getGymVisitHistory, deleteGym } = require('../controllers/gymController');
+const { createGym, getGyms, getGymById, getNearbyGyms, updateGym, getMyGyms, getGymVisitHistory, deleteGym } = require('../controllers/gymController');
 const { auth, authorize } = require('../middleware/auth');
+
+// GET /api/gyms/nearby (must be before /:id)
+router.get('/nearby', getNearbyGyms);
 
 // GET /api/gyms (public)
 router.get('/', getGyms);

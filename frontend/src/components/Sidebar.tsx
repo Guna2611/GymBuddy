@@ -24,7 +24,6 @@ const Sidebar = () => {
     const ownerLinks = [
         { to: '/owner/dashboard', icon: Building2, label: 'My Gyms' },
         { to: '/owner/analytics', icon: BarChart3, label: 'Analytics' },
-        { to: '/gyms', icon: MapPin, label: 'Browse Gyms' },
         { to: '/notifications', icon: Bell, label: 'Notifications' },
         { to: '/profile', icon: User, label: 'Profile' },
     ];

@@ -7,6 +7,7 @@ interface Gym {
     name: string;
     description?: string;
     address?: { city?: string; area?: string };
+    location?: { type: string; coordinates: number[] };
     facilities?: string[];
     pricing?: { monthly?: number; dayPass?: number };
     openingHours?: {
@@ -43,6 +44,8 @@ const EditGymModal = ({ gym, onClose, onUpdated }: Props) => {
         name: gym.name || '',
         city: gym.address?.city || '',
         area: gym.address?.area || '',
+        latitude: gym.location?.coordinates ? String(gym.location.coordinates[1]) : '',
+        longitude: gym.location?.coordinates ? String(gym.location.coordinates[0]) : '',
         description: gym.description || '',
         facilities: gym.facilities || [],
         monthlyPrice: String(gym.pricing?.monthly || ''),
@@ -64,12 +67,29 @@ const EditGymModal = ({ gym, onClose, onUpdated }: Props) => {
         }));
     };
 
+    const handleAutoDetectLocation = () => {
+        if (!navigator.geolocation) {
+            setError('Geolocation is not supported by your browser');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setForm(prev => ({
+                    ...prev,
+                    latitude: String(pos.coords.latitude),
+                    longitude: String(pos.coords.longitude)
+                }));
+            },
+            () => setError('Failed to get location. Please allow location access.')
+        );
+    };
+
     const handleSave = async () => {
         if (!form.name.trim()) { setError('Gym name is required'); return; }
         setLoading(true);
         setError('');
         try {
-            const res = await api.put(`/gyms/${gym._id}`, {
+            const payload: any = {
                 name: form.name,
                 description: form.description,
                 address: { city: form.city, area: form.area },
@@ -82,7 +102,16 @@ const EditGymModal = ({ gym, onClose, onUpdated }: Props) => {
                     weekdays: { open: form.weekdayOpen, close: form.weekdayClose },
                     weekends: { open: form.weekendOpen, close: form.weekendClose },
                 }
-            });
+            };
+
+            if (form.latitude && form.longitude) {
+                payload.location = {
+                    type: 'Point',
+                    coordinates: [parseFloat(form.longitude), parseFloat(form.latitude)]
+                };
+            }
+
+            const res = await api.put(`/gyms/${gym._id}`, payload);
             onUpdated(res.data.gym);
             onClose();
         } catch (err: any) {
@@ -129,6 +158,26 @@ const EditGymModal = ({ gym, onClose, onUpdated }: Props) => {
                             <input type="text" value={form.area}
                                 onChange={e => setForm({ ...form, area: e.target.value })}
                                 className="input-field" placeholder="Andheri West" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-xs font-medium text-dark-200 mb-1">Latitude</label>
+                            <input type="number" value={form.latitude}
+                                onChange={e => setForm({ ...form, latitude: e.target.value })}
+                                className="input-field" placeholder="19.0760" step="any" />
+                        </div>
+                        <div>
+                            <div className="flex justify-between items-end mb-1">
+                                <label className="block text-xs font-medium text-dark-200">Longitude</label>
+                                <button type="button" onClick={handleAutoDetectLocation}
+                                    className="text-[10px] text-accent hover:underline">
+                                    📍 Use My Location
+                                </button>
+                            </div>
+                            <input type="number" value={form.longitude}
+                                onChange={e => setForm({ ...form, longitude: e.target.value })}
+                                className="input-field" placeholder="72.8777" step="any" />
                         </div>
                     </div>
                     <div>

@@ -24,9 +24,16 @@ const gymSchema = new mongoose.Schema({
         state: { type: String, trim: true },
         zipCode: { type: String, trim: true }
     },
-    coordinates: {
-        latitude: { type: Number },
-        longitude: { type: Number }
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: undefined
+        }
     },
     photos: [{
         type: String // URLs to gym photos
@@ -82,5 +89,8 @@ const gymSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// 2dsphere index enables $near and $geoWithin geospatial queries
+gymSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('Gym', gymSchema);

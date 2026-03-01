@@ -40,9 +40,27 @@ const OwnerOnboardingPage = () => {
     const handleSubmit = async () => {
         setLoading(true);
         try {
+            // Attempt to get coordinates if available
+            let lat: number | undefined;
+            let lng: number | undefined;
+
+            try {
+                if (navigator.geolocation) {
+                    const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    lat = pos.coords.latitude;
+                    lng = pos.coords.longitude;
+                }
+            } catch (e) {
+                // Ignore geolocation errors during gym creation
+            }
+
             await gymService.createGym({
                 name: form.name,
                 address: { city: form.city, area: form.area },
+                latitude: lat,
+                longitude: lng,
                 description: form.description,
                 facilities: form.facilities,
                 pricing: {

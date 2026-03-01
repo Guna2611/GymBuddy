@@ -44,6 +44,10 @@ const userSchema = new mongoose.Schema({
         city: { type: String, trim: true },
         area: { type: String, trim: true }
     },
+    coordinates: {
+        latitude: { type: Number, default: null },
+        longitude: { type: Number, default: null }
+    },
     fitnessGoals: [{
         type: String,
         enum: ['weight-loss', 'muscle-gain', 'general-fitness', 'flexibility', 'endurance', 'strength']

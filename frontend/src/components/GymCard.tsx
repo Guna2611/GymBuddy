@@ -15,6 +15,7 @@ interface GymCardProps {
         photos?: string[];
         description?: string;
     };
+    distanceKm?: number;
     onSelect?: (gymId: string) => void;
     showSelect?: boolean;
 }
@@ -27,7 +28,7 @@ const facilityIcons: Record<string, string> = {
     'basketball-court': '🏀'
 };
 
-const GymCard = ({ gym, onSelect, showSelect }: GymCardProps) => {
+const GymCard = ({ gym, distanceKm, onSelect, showSelect }: GymCardProps) => {
     return (
         <div className="glass-card overflow-hidden hover:border-primary/20 transition-all group">
             {/* Photo placeholder */}
@@ -43,6 +44,12 @@ const GymCard = ({ gym, onSelect, showSelect }: GymCardProps) => {
                     <div className="absolute top-3 right-3 flex items-center gap-1 bg-dark-900/80 backdrop-blur-sm rounded-full px-2.5 py-1">
                         <Star className="w-3.5 h-3.5 text-accent fill-accent" />
                         <span className="text-xs font-bold text-white">{gym.rating.toFixed(1)}</span>
+                    </div>
+                )}
+                {distanceKm !== undefined && (
+                    <div className="absolute top-3 left-3 flex items-center gap-1 bg-emerald-500/90 backdrop-blur-sm rounded-full px-2.5 py-1">
+                        <MapPin className="w-3 h-3 text-white" />
+                        <span className="text-[10px] font-bold text-white">{distanceKm} km away</span>
                     </div>
                 )}
             </div>
@@ -77,7 +84,7 @@ const GymCard = ({ gym, onSelect, showSelect }: GymCardProps) => {
                 {/* Bottom row */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-dark-600/50">
                     <div className="flex items-center gap-3">
-                        {gym.pricing?.monthly && (
+                        {gym.pricing?.monthly !== undefined && (
                             <span className="flex items-center gap-0.5 text-sm font-bold text-secondary">
                                 <IndianRupee className="w-3.5 h-3.5" />{gym.pricing.monthly}<span className="text-[10px] text-dark-400 font-normal">/mo</span>
                             </span>

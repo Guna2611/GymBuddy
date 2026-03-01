@@ -122,10 +122,31 @@ const updateUserRole = async (req, res, next) => {
     }
 };
 
+/**
+ * @route   PUT /api/users/location
+ * @desc    Update user's GPS coordinates (from browser geolocation)
+ * @access  Private
+ */
+const updateUserLocation = async (req, res, next) => {
+    try {
+        const { latitude, longitude } = req.body;
+        if (latitude === undefined || longitude === undefined) {
+            return res.status(400).json({ message: 'latitude and longitude are required' });
+        }
+        await User.findByIdAndUpdate(req.user._id, {
+            coordinates: { latitude: parseFloat(latitude), longitude: parseFloat(longitude) }
+        });
+        res.json({ message: 'Location updated' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getProfile,
     updateProfile,
     getAllUsers,
     deleteUser,
-    updateUserRole
+    updateUserRole,
+    updateUserLocation
 };

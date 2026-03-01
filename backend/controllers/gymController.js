@@ -1,5 +1,6 @@
 const Gym = require('../models/Gym');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const CollaborationTicket = require('../models/CollaborationTicket');
 const { sendVerificationEmail } = require('../services/emailService');
 
@@ -14,11 +15,121 @@ const { sendVerificationEmail } = require('../services/emailService');
             owner: req.user._id
         };
 
+        // Convert latitude/longitude to GeoJSON format if provided
+        if (req.body.latitude && req.body.longitude) {
+            gymData.location = {
+                type: 'Point',
+                coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)]
+            };
+            delete gymData.latitude;
+            delete gymData.longitude;
+        }
+
         const gym = await Gym.create(gymData);
+
+        // Notify all users within 10km of the new gym (if coordinates provided)
+        if (gym.location && gym.location.coordinates && gym.location.coordinates.length === 2) {
+            const [lng, lat] = gym.location.coordinates;
+            const radiusInRadians = 10 / 6371; // 10km in radians
+
+            // Find users with coordinates set who are within ~10km
+            const nearbyUsers = await User.find({
+                'coordinates.latitude': { $ne: null },
+                'coordinates.longitude': { $ne: null },
+                role: 'user'
+            }).select('_id coordinates');
+
+            // Filter by haversine distance (simple approach since User doesn't have 2dsphere)
+            const toRad = (deg) => deg * (Math.PI / 180);
+            const haversine = (lat1, lng1, lat2, lng2) => {
+                const R = 6371;
+                const dLat = toRad(lat2 - lat1);
+                const dLng = toRad(lng2 - lng1);
+                const a = Math.sin(dLat / 2) ** 2 +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            };
+
+            const usersToNotify = nearbyUsers.filter(u =>
+                haversine(u.coordinates.latitude, u.coordinates.longitude, lat, lng) <= 10
+            );
+
+            if (usersToNotify.length > 0) {
+                const notifications = usersToNotify.map(u => ({
+                    user: u._id,
+                    type: 'nearby-gym',
+                    message: `📍 A new gym "${gym.name}" just opened near you in ${gym.address?.city || 'your area'}! Check it out.`,
+                    relatedId: gym._id,
+                    relatedModel: 'Gym'
+                }));
+                await Notification.insertMany(notifications);
+            }
+        }
 
         res.status(201).json({
             message: 'Gym created successfully',
             gym
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @route   GET /api/gyms/nearby
+ * @desc    Get gyms near a given latitude/longitude
+ * @access  Public
+ */
+const getNearbyGyms = async (req, res, next) => {
+    try {
+        const { lat, lng, radius = 10 } = req.query;
+
+        if (!lat || !lng) {
+            return res.status(400).json({ message: 'lat and lng query params are required' });
+        }
+
+        const latitude = parseFloat(lat);
+        const longitude = parseFloat(lng);
+        const radiusInMeters = parseFloat(radius) * 1000;
+
+        const gyms = await Gym.find({
+            isActive: true,
+            location: {
+                $near: {
+                    $geometry: { type: 'Point', coordinates: [longitude, latitude] },
+                    $maxDistance: radiusInMeters
+                }
+            }
+        })
+            .populate('owner', 'name email')
+            .limit(30);
+
+        // Attach distance (km) to each gym
+        const toRad = (deg) => deg * (Math.PI / 180);
+        const haversine = (lat1, lng1, lat2, lng2) => {
+            const R = 6371;
+            const dLat = toRad(lat2 - lat1);
+            const dLng = toRad(lng2 - lng1);
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        };
+
+        const gymsWithDistance = gyms.map(gym => {
+            const g = gym.toObject();
+            if (gym.location && gym.location.coordinates && gym.location.coordinates.length === 2) {
+                const [gLng, gLat] = gym.location.coordinates;
+                g.distanceKm = parseFloat(haversine(latitude, longitude, gLat, gLng).toFixed(1));
+            }
+            return g;
+        });
+
+        gymsWithDistance.sort((a, b) => (a.distanceKm ?? 999) - (b.distanceKm ?? 999));
+
+        res.json({
+            gyms: gymsWithDistance,
+            total: gymsWithDistance.length,
+            userLocation: { latitude, longitude }
         });
     } catch (error) {
         next(error);
@@ -241,6 +352,7 @@ module.exports = {
     createGym,
     getGyms,
     getGymById,
+    getNearbyGyms,
     updateGym,
     getMyGyms,
     getGymVisitHistory,

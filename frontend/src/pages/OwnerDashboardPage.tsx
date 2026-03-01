@@ -296,11 +296,10 @@ const OwnerDashboardPage = () => {
                     <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
                         <BarChart3 className="w-5 h-5 text-secondary" /> Quick Actions
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {[
                             { label: 'Register New Gym', desc: 'Add another gym to the platform', icon: Plus, link: '/owner/onboarding', color: 'secondary' },
-                            { label: 'Browse All Gyms', desc: 'See how other gyms are listed', icon: MapPin, link: '/gyms', color: 'primary' },
-                            { label: 'View All Stats', desc: 'Platform-wide analytics', icon: TrendingUp, link: '/gyms', color: 'accent' },
+                            { label: 'View All Stats', desc: 'Platform-wide analytics', icon: TrendingUp, link: '/owner/analytics', color: 'accent' },
                         ].map(action => (
                             <Link key={action.label} to={action.link}
                                 className="glass-card p-4 hover:border-primary/30 transition-all cursor-pointer group">

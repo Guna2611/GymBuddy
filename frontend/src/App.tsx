@@ -18,6 +18,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import AdminDashboard from './pages/AdminDashboard';
 import OwnerOnboardingPage from './pages/OwnerOnboardingPage';
 import OwnerDashboardPage from './pages/OwnerDashboardPage';
+import OwnerAnalyticsPage from './pages/OwnerAnalyticsPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
               {/* Owner */}
               <Route path="/owner/onboarding" element={<ProtectedRoute roles={['gymOwner']}><OwnerOnboardingPage /></ProtectedRoute>} />
               <Route path="/owner/dashboard" element={<ProtectedRoute roles={['gymOwner']}><OwnerDashboardPage /></ProtectedRoute>} />
+              <Route path="/owner/analytics" element={<ProtectedRoute roles={['gymOwner']}><OwnerAnalyticsPage /></ProtectedRoute>} />
               <Route path="/owner/*" element={<ProtectedRoute roles={['gymOwner']}><OwnerDashboardPage /></ProtectedRoute>} />
             </Routes>
           </div>

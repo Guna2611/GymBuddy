@@ -16,7 +16,7 @@ const notificationSchema = new mongoose.Schema({
             'match-request', 'match-accepted', 'match-rejected',
             'ticket-created', 'ticket-confirmed', 'ticket-active',
             'ticket-completed', 'ticket-cancelled',
-            'gym-selected', 'system'
+            'gym-selected', 'nearby-gym', 'system'
         ],
         required: true
     },

@@ -25,7 +25,6 @@ const Navbar = () => {
         ? user.role === 'gymOwner'
             ? [
                 { label: 'Dashboard', path: '/owner/dashboard', icon: LayoutDashboard },
-                { label: 'Browse Gyms', path: '/gyms', icon: Building2 },
             ]
             : [
                 { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },

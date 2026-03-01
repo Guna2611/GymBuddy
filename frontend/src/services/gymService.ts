@@ -6,6 +6,11 @@ export const gymService = {
         return res.data;
     },
 
+    getNearbyGyms: async (lat: number, lng: number, radiusKm: number = 10) => {
+        const res = await api.get('/gyms/nearby', { params: { lat, lng, radius: radiusKm } });
+        return res.data;
+    },
+
     getGymById: async (id: string) => {
         const res = await api.get(`/gyms/${id}`);
         return res.data;
@@ -23,6 +28,11 @@ export const gymService = {
 
     getMyGyms: async () => {
         const res = await api.get('/gyms/owner/my-gyms');
+        return res.data;
+    },
+
+    updateUserLocation: async (latitude: number, longitude: number) => {
+        const res = await api.put('/users/location', { latitude, longitude });
         return res.data;
     }
 };
