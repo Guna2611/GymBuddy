@@ -84,11 +84,11 @@ const GymCard = ({ gym, distanceKm, onSelect, showSelect }: GymCardProps) => {
                 {/* Bottom row */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-dark-600/50">
                     <div className="flex items-center gap-3">
-                        {gym.pricing?.monthly !== undefined && (
+                        {gym.pricing?.monthly ? (
                             <span className="flex items-center gap-0.5 text-sm font-bold text-secondary">
                                 <IndianRupee className="w-3.5 h-3.5" />{gym.pricing.monthly}<span className="text-[10px] text-dark-400 font-normal">/mo</span>
                             </span>
-                        )}
+                        ) : null}
                         {gym.openingHours?.weekdays && (
                             <span className="flex items-center gap-1 text-[10px] text-dark-400">
                                 <Clock className="w-3 h-3" />

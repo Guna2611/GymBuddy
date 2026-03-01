@@ -106,22 +106,22 @@ const GymDetailPage = () => {
                                     <div className="glass-card p-6">
                                         <h3 className="text-base font-bold text-white mb-4">Pricing</h3>
                                         <div className="space-y-3">
-                                            {gym.pricing?.monthly && (
+                                            {gym.pricing?.monthly ? (
                                                 <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-primary/10 to-transparent border border-primary/20">
                                                     <span className="text-sm text-dark-200">Monthly</span>
                                                     <span className="flex items-center gap-0.5 text-lg font-bold text-primary-light">
                                                         <IndianRupee className="w-4 h-4" />{gym.pricing.monthly}
                                                     </span>
                                                 </div>
-                                            )}
-                                            {gym.pricing?.dayPass && (
+                                            ) : null}
+                                            {gym.pricing?.dayPass ? (
                                                 <div className="flex items-center justify-between p-3 rounded-xl bg-dark-700/50">
                                                     <span className="text-sm text-dark-200">Day Pass</span>
                                                     <span className="flex items-center gap-0.5 text-lg font-bold text-secondary">
                                                         <IndianRupee className="w-4 h-4" />{gym.pricing.dayPass}
                                                     </span>
                                                 </div>
-                                            )}
+                                            ) : null}
                                         </div>
                                     </div>
 
