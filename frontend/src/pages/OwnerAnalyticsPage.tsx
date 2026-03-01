@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { gymService } from '../services/gymService';
 import api from '../services/api';
 import {
-    BarChart3, Activity, Users, IndianRupee, SwitchCamera, CheckCircle2,
-    Calendar, TrendingUp, AlertCircle
+    BarChart3, Activity, Users, SwitchCamera, CheckCircle2, TrendingUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const OwnerAnalyticsPage = () => {
-    const { user } = useAuth();
     const [stats, setStats] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTimeframe, setSelectedTimeframe] = useState('month');
