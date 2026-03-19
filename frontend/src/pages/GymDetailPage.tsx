@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { gymService } from '../services/gymService';
 import { paymentService } from '../services/paymentService';
@@ -17,7 +17,6 @@ const facilityIcons: Record<string, string> = {
 const GymDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
-    const navigate = useNavigate();
     const [gym, setGym] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');

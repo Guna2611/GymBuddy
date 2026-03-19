@@ -16,7 +16,6 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [googleLoading, setGoogleLoading] = useState(false);
 
     const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
         const credential = credentialResponse.credential;
@@ -24,7 +23,6 @@ export default function LoginPage() {
             setError('Google sign-in did not return a credential.');
             return;
         }
-        setGoogleLoading(true);
         setError('');
         try {
             await loginWithGoogle(credential);
@@ -37,8 +35,6 @@ export default function LoginPage() {
             const msg = err instanceof Error ? err.message : 'Google sign-in failed';
             setError(msg);
             toast.addToast(msg, 'error');
-        } finally {
-            setGoogleLoading(false);
         }
     };
 
@@ -169,7 +165,6 @@ export default function LoginPage() {
                                         size="large"
                                         width="320"
                                         text="continue_with"
-                                        disabled={googleLoading}
                                     />
                                 </div>
                             </>

@@ -38,13 +38,13 @@ export default function FeedPage() {
 
     const handleLike = async (postId: string) => {
         try {
-            const { liked, likes: count } = await postService.likePost(postId);
+            const { liked } = await postService.likePost(postId);
             setPosts((prev) =>
                 prev.map((p) => {
                     if (p._id !== postId) return p;
+                    if (!user?.id) return p;
                     const ids = p.likes || [];
-                    const hasLiked = ids.some((id: string) => String(id) === user?.id);
-                    const newLikes = liked ? [...ids, user?.id] : ids.filter((id: string) => String(id) !== user?.id);
+                    const newLikes = liked ? [...ids, user.id] : ids.filter((id: string) => String(id) !== user.id);
                     return { ...p, likes: newLikes };
                 })
             );

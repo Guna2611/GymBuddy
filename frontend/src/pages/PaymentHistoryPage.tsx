@@ -81,7 +81,6 @@ export default function PaymentHistoryPage() {
                 <div className="space-y-4">
                     {payments.map((p) => {
                         const cfg = statusConfig[p.status] || statusConfig.pending;
-                        const Icon = cfg.icon;
                         return (
                             <div key={p.id} className="glass-card p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <div>

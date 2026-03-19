@@ -9,8 +9,6 @@ export default function ForgotPasswordPage() {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [sent, setSent] = useState(false);
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -22,7 +20,6 @@ export default function ForgotPasswordPage() {
         setLoading(true);
         try {
             await authService.forgotPassword(mail);
-            setSent(true);
             navigate(`/reset-password?email=${encodeURIComponent(mail)}`);
         } catch (err: unknown) {
             const res = (err as { response?: { data?: { message?: string } } })?.response?.data;
