@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
         try {
             const data = await authService.resetPassword(mail, otp, newPassword);
             if (data.token && data.user) {
-                handleAuthResponse(data as { token: string; user: object });
+                handleAuthResponse(data as any);
                 navigate('/dashboard', { replace: true });
             } else {
                 setError(data.message || 'Reset failed');

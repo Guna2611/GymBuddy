@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+src/pages/ProfilePage.tsx(174,65): error TS2339: Property 'profilePicture' does not exist on type 'User'.
+src/pages/RegisterPage.tsx(139,33): error TS2322: Type '{ onSuccess: (credentialResponse: { credential?: string | undefined; }) => Promise<void>; onError: () => void; useOneTap: false; theme: "filled_black"; size: "large"; width: string; text: "signup_with"; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & { onSuccess: (credentialResponse: CredentialResponse) => void; onError?: (() => void) | undefined; promptMomentNotification?: MomentListener | undefined; useOneTap?: boolean | undefined; containerProps?: Omit<...> | undefined; } & Omit<...> & GsiButtonConfiguration'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & { onSuccess: (credentialResponse: CredentialResponse) => void; onError?: (() => void) | undefined; promptMomentNotification?: MomentListener | undefined; useOneTap?: boolean | undefined; containerProps?: Omit<...> | undefined; } & Omit<...> & GsiButtonConfiguration'.
+src/pages/ResetPasswordPage.tsx(46,36): error TS2345: Argument of type '{ token: string; user: object; }' is not assignable to parameter of type '{ token: string; user: AuthUser; }'.
+  Types of property 'user' are incompatible.
+    Type '{}' is missing the following properties from type 'AuthUser': id, name, email, role, and 2 more.
+src/pages/VerifyOtpPage.tsx(37,36): error TS2345: Argument of type '{ token: string; user: object; }' is not assignable to parameter of type '{ token: string; user: AuthUser; }'.
+  Types of property 'user' are incompatible.
+    Type '{}' is missing the following properties from type 'AuthUser': id, name, email, role, and 2 more.

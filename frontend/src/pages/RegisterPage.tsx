@@ -18,15 +18,12 @@ export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [googleLoading, setGoogleLoading] = useState(false);
-
     const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
         const credential = credentialResponse.credential;
         if (!credential) {
             setError('Google sign-in did not return a credential.');
             return;
         }
-        setGoogleLoading(true);
         setError('');
         try {
             await loginWithGoogle(credential);
@@ -39,8 +36,6 @@ export default function RegisterPage() {
             const msg = err instanceof Error ? err.message : 'Google sign-in failed';
             setError(msg);
             toast.addToast(msg, 'error');
-        } finally {
-            setGoogleLoading(false);
         }
     };
 
@@ -136,7 +131,6 @@ export default function RegisterPage() {
                                 size="large"
                                 width="320"
                                 text="signup_with"
-                                disabled={googleLoading}
                             />
                         </div>
                     )}

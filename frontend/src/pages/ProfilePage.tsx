@@ -171,7 +171,7 @@ export default function ProfilePage() {
         );
     }
 
-    const avatarUrl = getAvatarUrl((user?.profilePhoto || user?.profilePicture || profileData?.profilePhoto || profileData?.profilePicture) as string);
+    const avatarUrl = getAvatarUrl((user?.profilePhoto || (user as any)?.profilePicture || profileData?.profilePhoto || profileData?.profilePicture) as string);
 
     return (
         <PageBackground image="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1600&q=80&auto=format" align="top">

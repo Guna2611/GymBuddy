@@ -34,7 +34,7 @@ export default function VerifyOtpPage() {
         try {
             const data = await authService.verifyOtp(mail, otp);
             if (data.token && data.user) {
-                handleAuthResponse(data as { token: string; user: object });
+                handleAuthResponse(data as any);
                 navigate(data.user.isProfileComplete ? '/dashboard' : '/onboarding', { replace: true });
             } else {
                 setError(data.message || 'Verification failed');
