@@ -1,221 +1,171 @@
-# 🏋️ GymBuddy
+# GymBuddy
 
-GymBuddy is a full-stack fitness platform that connects gym-goers with compatible workout partners based on fitness goals, schedules, and workout preferences. The platform helps users stay consistent in their fitness journey through partner matching, gym discovery, and collaboration sessions.
+**GymBuddy** is a full-stack web application that connects gym-goers with compatible workout partners based on fitness goals, schedule, workout style, and mindset. Gym owners can list and manage their gyms, while users find and collaborate with workout partners through a smart matching system.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-### 🔐 Authentication
-
-* User registration with profile photo
-* OTP email verification
-* Secure login using JWT authentication
-* Forgot password functionality
-* Role-based access (User, Gym Owner, Admin)
-
-### 👤 Fitness Profiles
-
-* Complete fitness profile setup
-* Profile completion progress bar
-* Avatar and cover photo upload
-* Fitness goals, experience level, and workout preferences
-
-### 🤝 Smart Partner Matching
-
-* Compatibility-based partner matching
-* Suggestions based on:
-
-  * Fitness goals
-  * Workout schedule
-  * Experience level
-* Swipe-style interaction
-
-### 🏋️ Gym Directory
-
-* Browse gyms by city and area
-* View gym facilities and details
-* Gym owners can list and manage their gyms
-
-### 📱 Social Feed
-
-* Create posts with gym photos
-* Like and comment on posts
-* Community interaction
-
-### 💬 Chat & Collaboration
-
-* Messaging between matched users
-* Collaboration session tickets for workout planning
-
-### 🔔 Notifications
-
-* In-app notification center
-* Alerts for matches, messages, and session updates
+- **Smart Partner Matching** — Swipe-style matching based on fitness goals, experience level, and schedule
+- **Collaboration Tickets** — Book and track shared gym sessions with your match
+- **Gym Directory** — Browse and filter gyms by location, facilities, and pricing
+- **Gym Owner Dashboard** — List multiple gyms, view visitor stats and recent activity
+- **Admin Dashboard** — Manage all users, change roles, and delete gyms/users
+- **Email Verification** — Gym owners verify their email during onboarding
+- **JWT Authentication** — Secure login with token validation on every app load
+- **Role-Based Access** — `user`, `gymOwner`, and `admin` roles with protected routes
+- **Real-time Notifications** — In-app notifications for matches and ticket updates
 
 ---
 
 ## 🛠 Tech Stack
 
-### Frontend
-
-* React 18
-* TypeScript
-* Vite
-* Tailwind CSS
-* Lucide React
-
-### Backend
-
-* Node.js
-* Express.js
-* MongoDB (Mongoose)
-
-### Authentication
-
-* JWT (JSON Web Token)
-* OTP Email Verification
-
-### Email Service
-
-* Nodemailer
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS v4, Custom CSS |
+| State | React Context API |
+| Backend | Node.js, Express.js |
+| Database | MongoDB Atlas (Mongoose) |
+| Auth | JWT (jsonwebtoken) |
+| Email | Nodemailer (Gmail SMTP) |
+| Icons | Lucide React |
 
 ---
 
-## ⚙️ Installation & Setup
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Make sure you have installed:
+- Node.js v18+
+- MongoDB Atlas account
+- Gmail account (for email verification)
 
-* Node.js (v18 or higher)
-* MongoDB (Local or MongoDB Atlas)
-* npm or yarn
+### 1. Clone the repository
 
----
+```bash
+git clone https://github.com/YOUR_USERNAME/gym-buddy.git
+cd gym-buddy
+```
 
-## Backend Setup
+### 2. Backend Setup
 
 cd backend
 npm install
 cp .env.example .env
+# Fill in your .env values (see Environment Variables below)
+node server.js
+```
 
-Edit the `.env` file with your credentials:
+### 3. Frontend Setup
 
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/gymbuddy
-JWT_SECRET=your_secret_min_32_chars
-PORT=5000
-EMAIL_USER=[your@gmail.com](mailto:your@gmail.com)
-EMAIL_PASS=your_app_password
-FRONTEND_URL=http://localhost:5173
-
-Start backend server:
-
-npm run dev
-
-Backend will run on:
-
-http://localhost:5000
-
----
-
-## Frontend Setup
-
+```bash
 cd frontend
 npm install
-
-(Optional) create `.env` inside frontend:
-
-VITE_API_URL=http://localhost:5000/api
-
-Start frontend:
-
+cp .env.example .env
 npm run dev
+```
 
-Frontend will run on:
-
-http://localhost:5173
-
----
-
-## 🌱 Seed Demo Data
-
-Run the seed script to add demo users and gyms:
-
-cd backend
-npm run seed
-
-### Demo Accounts
-
-User
-Email: [arjun@example.com](mailto:arjun@example.com)
-Password: Password1!
-
-Gym Owner
-Email: [gymowner@example.com](mailto:gymowner@example.com)
-Password: Password1!
-
-Admin
-Email: [admin@gymbuddy.com](mailto:admin@gymbuddy.com)
-Password: Admin1!
+The app will be available at **http://localhost:5173**
 
 ---
 
 ## 🔐 Environment Variables
 
-| Variable     | Description                       |
-| ------------ | --------------------------------- |
-| MONGODB_URI  | MongoDB connection string         |
-| JWT_SECRET   | Secret key for JWT                |
-| PORT         | Backend port                      |
-| EMAIL_USER   | Gmail account used for OTP emails |
-| EMAIL_PASS   | Gmail App Password                |
-| FRONTEND_URL | Frontend base URL                 |
-| VITE_API_URL | Backend API URL                   |
+### Backend (`backend/.env`)
+
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Server port (default: 3000) |
+| `NODE_ENV` | `development` or `production` |
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `JWT_SECRET` | Strong random string for signing JWTs |
+| `EMAIL_SERVICE` | Email provider (e.g. `gmail`) |
+| `EMAIL_USER` | Email address for sending verification emails |
+| `EMAIL_PASS` | Gmail App Password (not your account password) |
+| `FRONTEND_URL` | Frontend URL for email links (e.g. `http://localhost:5173`) |
+
+### Frontend (`frontend/.env`)
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_API_URL` | Backend API URL (e.g. `http://localhost:3000/api`) |
 
 ---
 
-## 📂 Project Structure
+## 👤 User Roles
 
-GymBuddy
-│
-├── backend
-│   ├── config
-│   ├── controllers
-│   ├── middleware
-│   ├── models
-│   ├── routes
-│   ├── services
-│   └── server.js
-│
-├── frontend
-│   ├── src
-│   │   ├── components
-│   │   ├── context
-│   │   ├── pages
-│   │   ├── services
-│   │   └── utils
-│   │
+| Role | Access |
+|------|--------|
+| `user` | Dashboard, matching, tickets, gym browser |
+| `gymOwner` | All user access + owner dashboard (list/manage gyms) |
+| `admin` | Full platform access — manage all users and gyms |
+
+### Promote a user to admin
+
+```bash
+cd backend
+node scripts/make-admin.js user@email.com
+```
+
+---
+
+## 📁 Project Structure
+
+```
+gym-buddy/
+├── backend/
+│   ├── controllers/     # Route handlers
+│   ├── models/          # Mongoose schemas
+│   ├── routes/          # Express routers
+│   ├── middleware/       # Auth, error handling
+│   ├── services/        # Email, business logic
+│   ├── scripts/         # One-time utility scripts
+│   └── server.js        # Entry point
+├── frontend/
+│   ├── src/
+│   │   ├── components/  # Reusable UI components
+│   │   ├── context/     # Auth context
+│   │   ├── pages/       # Route-level page components
+│   │   └── services/    # API service layer
 │   └── vite.config.ts
 │
 └── README.md
+```
 
 ---
 
-## 📈 Future Improvements
+## 🌿 Git Branching Strategy
 
-* AI-based workout partner recommendation
-* Real-time chat using WebSockets
-* Workout progress tracking
-* Fitness challenges and leaderboards
-* Mobile application
+```
+main         → Production-ready code
+dev          → Active development
+feature/*    → New features (branch from dev)
+fix/*        → Bug fixes
+```
+
+Example:
+```bash
+git checkout dev
+git checkout -b feature/notifications
+# work...
+git push origin feature/notifications
+# open pull request → dev → main
+```
 
 ---
 
-## 👩‍💻 Author
+## 📦 Deployment Notes
 
-Sruthi Kommati
-B.Tech Computer Science
-IIIT Sri City
+- Set `NODE_ENV=production` on the server
+- Use a process manager like **PM2** for the backend: `pm2 start server.js`
+- Build the frontend: `cd frontend && npm run build` — serve `dist/` via Nginx or a CDN
+- Tighten the rate limiter in `backend/server.js` for production
+- Use strong, randomly generated `JWT_SECRET` (64+ characters)
+- Enable MongoDB Atlas IP whitelisting for your server's IP
 
-GitHub: https://github.com/Sruthi141
+---
+
+## 📄 License
+
+MIT
